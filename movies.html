@@ -274,10 +274,22 @@ const MOVIES = {
 
 const STORAGE_KEY = "qiji_movie_data";
 
+// 默认观影记录（由主人维护，每次更新会合并到本地数据）
+const DEFAULT_DATA = {
+  "时空恋旅人": { watched: true, count: 1, rating: 4 }
+};
+
 function loadData() {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-  } catch { return {}; }
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+    // 合并默认数据：本地已有的保留本地值，没有的用默认值
+    for (const [key, val] of Object.entries(DEFAULT_DATA)) {
+      if (!stored[key] || (!stored[key].watched && stored[key].count === 0)) {
+        stored[key] = val;
+      }
+    }
+    return stored;
+  } catch { return { ...DEFAULT_DATA }; }
 }
 
 function saveData(data) {
