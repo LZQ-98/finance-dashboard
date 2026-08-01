@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎬 祈霁的必看片单</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: #e4e4e4;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  header {
+    text-align: center;
+    padding: 30px 0;
+  }
+  header h1 {
+    font-size: 2.2em;
+    background: linear-gradient(90deg, #e94560, #f5a623, #e94560);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s linear infinite;
+  }
+  @keyframes shimmer { to { background-position: 200% center; } }
+  header p { color: #888; margin-top: 8px; font-size: 0.95em; }
+
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 20px 0 30px;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 15px 25px;
+    text-align: center;
+  }
+  .stat-num {
+    font-size: 2em;
+    font-weight: bold;
+    color: #e94560;
+  }
+  .stat-label { font-size: 0.85em; color: #888; margin-top: 4px; }
+
+  .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    margin: 0 0 30px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #e94560, #f5a623);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  .category {
+    margin-bottom: 30px;
+  }
+  .category-title {
+    font-size: 1.3em;
+    margin-bottom: 15px;
+    padding-left: 12px;
+    border-left: 4px solid #e94560;
+    color: #fff;
+  }
+
+  .movie-list {
+    display: grid;
+    gap: 10px;
+  }
+  .movie-item {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s;
+  }
+  .movie-item:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(233,69,96,0.3);
+  }
+  .movie-item.watched {
+    border-color: rgba(76,175,80,0.4);
+    background: rgba(76,175,80,0.08);
+  }
+
+  .movie-check {
+    width: 22px; height: 22px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .movie-check.checked {
+    background: #4caf50;
+    border-color: #4caf50;
+  }
+  .movie-check.checked::after {
+    content: '✓';
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .movie-info { flex: 1; }
+  .movie-name { font-size: 1em; color: #fff; }
+  .movie-year { font-size: 0.8em; color: #666; margin-left: 6px; }
+  .movie-item.watched .movie-name {
+    text-decoration: line-through;
+    color: #888;
+  }
+
+  .watch-count {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .watch-btn {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.05);
+    color: #ccc;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .watch-btn:hover { background: rgba(233,69,96,0.3); border-color: #e94560; }
+  .watch-num {
+    font-size: 0.9em;
+    color: #f5a623;
+    min-width: 20px;
+    text-align: center;
+  }
+
+  .rating {
+    display: flex;
+    gap: 3px;
+  }
+  .star {
+    cursor: pointer;
+    font-size: 16px;
+    color: rgba(255,255,255,0.2);
+    transition: color 0.2s;
+  }
+  .star.active { color: #f5a623; }
+  .star:hover { color: #f5a623; }
+
+  footer {
+    text-align: center;
+    padding: 30px 0 10px;
+    color: #555;
+    font-size: 0.85em;
+  }
+
+  @media (max-width: 600px) {
+    .movie-item { flex-wrap: wrap; }
+    .stats-bar { gap: 15px; }
+    .stat-item { padding: 10px 18px; }
+    header h1 { font-size: 1.6em; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🎬 祈霁的必看片单</h1>
+    <p>记录观影旅程，每一部都值得</p>
+  </header>
+
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num" id="watchedCount">0</div>
+      <div class="stat-label">已看</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="totalCount">0</div>
+      <div class="stat-label">总计</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="progressPercent">0%</div>
+      <div class="stat-label">完成度</div>
+    </div>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+  </div>
+
+  <div id="movieContainer"></div>
+
+  <footer>
+    <p>数据保存在本地浏览器 · 祈霁 & 霁光</p>
+  </footer>
+</div>
+
+<script>
+const MOVIES = {
+  "剧情 / 人生": [
+    { name: "肖申克的救赎", year: 1994 },
+    { name: "阿甘正传", year: 1994 },
+    { name: "辛德勒的名单", year: 1993 },
+    { name: "美丽人生", year: 1997 },
+    { name: "霸王别姬", year: 1993 },
+    { name: "活着", year: 1994 },
+    { name: "当幸福来敲门", year: 2006 },
+    { name: "海上钢琴师", year: 1998 }
+  ],
+  "科幻 / 烧脑": [
+    { name: "星际穿越", year: 2014 },
+    { name: "盗梦空间", year: 2010 },
+    { name: "黑客帝国", year: 1999 },
+    { name: "2001太空漫游", year: 1968 },
+    { name: "银翼杀手2049", year: 2017 },
+    { name: "蝴蝶效应", year: 2004 },
+    { name: "恐怖游轮", year: 2009 }
+  ],
+  "犯罪 / 悬疑": [
+    { name: "教父", year: 1972 },
+    { name: "沉默的羔羊", year: 1991 },
+    { name: "七宗罪", year: 1995 },
+    { name: "致命ID", year: 2003 },
+    { name: "看不见的客人", year: 2016 },
+    { name: "无间道", year: 2002 },
+    { name: "让子弹飞", year: 2010 }
+  ],
+  "爱情 / 情感": [
+    { name: "泰坦尼克号", year: 1997 },
+    { name: "情书", year: 1995 },
+    { name: "真爱至上", year: 2003 },
+    { name: "花样年华", year: 2000 },
+    { name: "时空恋旅人", year: 2013 }
+  ],
+  "动画": [
+    { name: "千与千寻", year: 2001 },
+    { name: "龙猫", year: 1988 },
+    { name: "疯狂动物城", year: 2016 },
+    { name: "机器人总动员", year: 2008 },
+    { name: "你的名字", year: 2016 }
+  ],
+  "战争 / 历史": [
+    { name: "拯救大兵瑞恩", year: 1998 },
+    { name: "钢琴家", year: 2002 },
+    { name: "勇敢的心", year: 1995 }
+  ],
+  "喜剧 / 治愈": [
+    { name: "触不可及", year: 2011 },
+    { name: "布达佩斯大饭店", year: 2014 },
+    { name: "三傻大闹宝莱坞", year: 2009 }
+  ]
+};
+
+const STORAGE_KEY = "qiji_movie_data";
+
+function loadData() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+  } catch { return {}; }
+}
+
+function saveData(data) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+}
+
+function getMovieKey(name) {
+  return name.replace(/\s+/g, '');
+}
+
+function render() {
+  const container = document.getElementById("movieContainer");
+  const data = loadData();
+  let totalMovies = 0;
+  let watchedMovies = 0;
+
+  container.innerHTML = "";
+
+  for (const [category, movies] of Object.entries(MOVIES)) {
+    const catDiv = document.createElement("div");
+    catDiv.className = "category";
+    catDiv.innerHTML = `<div class="category-title">${category}</div>`;
+
+    const listDiv = document.createElement("div");
+    listDiv.className = "movie-list";
+
+    movies.forEach(movie => {
+      const key = getMovieKey(movie.name);
+      const movieData = data[key] || { watched: false, count: 0, rating: 0 };
+      totalMovies++;
+      if (movieData.watched) watchedMovies++;
+
+      const item = document.createElement("div");
+      item.className = "movie-item" + (movieData.watched ? " watched" : "");
+      item.id = `movie-${key}`;
+
+      let stars = "";
+      for (let i = 1; i <= 5; i++) {
+        stars += `<span class="star ${i <= movieData.rating ? 'active' : ''}" data-rating="${i}">★</span>`;
+      }
+
+      item.innerHTML = `
+        <div class="movie-check ${movieData.watched ? 'checked' : ''}" data-key="${key}"></div>
+        <div class="movie-info">
+          <span class="movie-name">${movie.name}</span>
+          <span class="movie-year">(${movie.year})</span>
+        </div>
+        <div class="rating" data-key="${key}">${stars}</div>
+        <div class="watch-count">
+          <button class="watch-btn" data-key="${key}" data-action="minus">−</button>
+          <span class="watch-num">${movieData.count || ''}</span>
+          <button class="watch-btn" data-key="${key}" data-action="plus">+</button>
+        </div>
+      `;
+      listDiv.appendChild(item);
+    });
+
+    catDiv.appendChild(listDiv);
+    container.appendChild(catDiv);
+  }
+
+  // Update stats
+  const percent = totalMovies > 0 ? Math.round((watchedMovies / totalMovies) * 100) : 0;
+  document.getElementById("watchedCount").textContent = watchedMovies;
+  document.getElementById("totalCount").textContent = totalMovies;
+  document.getElementById("progressPercent").textContent = percent + "%";
+  document.getElementById("progressFill").style.width = percent + "%";
+}
+
+// Event delegation
+document.addEventListener("click", function(e) {
+  const data = loadData();
+  const key = e.target.dataset.key;
+
+  if (!key) return;
+
+  if (!data[key]) data[key] = { watched: false, count: 0, rating: 0 };
+
+  // Toggle watch status
+  if (e.target.classList.contains("movie-check")) {
+    data[key].watched = !data[key].watched;
+    if (data[key].watched && data[key].count === 0) data[key].count = 1;
+  }
+
+  // Watch count buttons
+  if (e.target.classList.contains("watch-btn")) {
+    const action = e.target.dataset.action;
+    if (action === "plus") {
+      data[key].count = (data[key].count || 0) + 1;
+      data[key].watched = true;
+    } else if (action === "minus") {
+      data[key].count = Math.max(0, (data[key].count || 0) - 1);
+      if (data[key].count === 0) data[key].watched = false;
+    }
+  }
+
+  // Rating stars
+  if (e.target.classList.contains("star")) {
+    const rating = parseInt(e.target.dataset.rating);
+    data[key].rating = data[key].rating === rating ? 0 : rating;
+    data[key].watched = true;
+  }
+
+  saveData(data);
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
